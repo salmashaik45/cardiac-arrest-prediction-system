@@ -49,75 +49,75 @@
 <p><em>All fields are mandatory. Sensor data is auto-fetched below.</em></p>
 
 <form id="predict-form">
-  <label for="age">Age (in years)</label>
-  <input type="number" name="age" id="age" required>
+  <label>Age (in years)</label>
+  <input type="number" name="age" required>
 
-  <label for="sex">Biological Sex</label>
-  <select name="sex" id="sex" required>
+  <label>Biological Sex</label>
+  <select name="sex" required>
     <option value="">Select</option>
     <option value="1">Male</option>
     <option value="0">Female</option>
   </select>
 
-  <label for="cholesterol">Cholesterol Level (mg/dL)</label>
-  <input type="number" name="cholesterol" id="cholesterol" required>
+  <label>Cholesterol Level (mg/dL)</label>
+  <input type="number" name="cholesterol" required>
 
-  <label for="diabetes">Do you have Diabetes?</label>
-  <select name="diabetes" id="diabetes" required>
+  <label>Do you have Diabetes?</label>
+  <select name="diabetes" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="family">Family History of Heart Problems?</label>
-  <select name="family" id="family" required>
+  <label>Family History of Heart Problems?</label>
+  <select name="family" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="smoke">Do you smoke?</label>
-  <select name="smoke" id="smoke" required>
+  <label>Do you smoke?</label>
+  <select name="smoke" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="alcohol">Consume Alcohol?</label>
-  <select name="alcohol" id="alcohol" required>
+  <label>Consume Alcohol?</label>
+  <select name="alcohol" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="prev_heart">Previous Heart Conditions?</label>
-  <select name="prev_heart" id="prev_heart" required>
+  <label>Previous Heart Conditions?</label>
+  <select name="prev_heart" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="meds">Cardiac Medication?</label>
-  <select name="meds" id="meds" required>
+  <label>Cardiac Medication?</label>
+  <select name="meds" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label for="stress">Stress Level (1-10)</label>
-  <input type="number" name="stress" id="stress" min="1" max="10" required>
+  <label>Stress Level (1-10)</label>
+  <input type="number" name="stress" min="1" max="10" required>
 
-  <label for="activity">Physical Activity Days/Week (0-7)</label>
-  <input type="number" name="activity" id="activity" min="0" max="7" required>
+  <label>Physical Activity Days/Week (0-7)</label>
+  <input type="number" name="activity" min="0" max="7" required>
 
-  <label for="sleep">Sleep Hours/Day</label>
-  <input type="number" name="sleep" id="sleep" min="1" max="24" required>
+  <label>Sleep Hours/Day</label>
+  <input type="number" name="sleep" min="1" max="24" required>
 
-  <label for="sbp">Systolic BP</label>
-  <input type="number" name="sbp" id="sbp" required>
+  <label>Systolic BP</label>
+  <input type="number" name="sbp" required>
 
-  <label for="dbp">Diastolic BP</label>
-  <input type="number" name="dbp" id="dbp" required>
+  <label>Diastolic BP</label>
+  <input type="number" name="dbp" required>
 
   <button type="submit">Predict Cardiac Risk</button>
 </form>
@@ -132,14 +132,28 @@
 <script>
   async function fetchSensorData() {
     try {
-      const res = await fetch("https://api.thingspeak.com/channels/3017666/feeds.json?api_key=GF8053OVJNAFFLJ6&results=1");
+      const res = await fetch("/api/sensor/");
+
+      if (!res.ok) {
+        throw new Error("Sensor API error");
+      }
+
       const data = await res.json();
-      const latest = data.feeds[0];
-      document.getElementById("heart-rate").textContent = parseFloat(latest.field1).toFixed(1);
-      document.getElementById("spo2").textContent = parseFloat(latest.field2).toFixed(1);
-      document.getElementById("body-temp").textContent = parseFloat(latest.field3).toFixed(1);
+
+      document.getElementById("heart-rate").textContent =
+        parseFloat(data.heart_rate || 0).toFixed(1);
+
+      document.getElementById("spo2").textContent =
+        parseFloat(data.spo2 || 0).toFixed(1);
+
+      document.getElementById("body-temp").textContent =
+        parseFloat(data.body_temp || 0).toFixed(1);
+
     } catch (e) {
-      console.error("Sensor fetch error", e);
+      console.error("Sensor fetch error:", e);
+      document.getElementById("heart-rate").textContent = "N/A";
+      document.getElementById("spo2").textContent = "N/A";
+      document.getElementById("body-temp").textContent = "N/A";
     }
   }
 
@@ -147,20 +161,26 @@
     event.preventDefault();
     const form = event.target;
     const data = {};
+
     for (const field of form.elements) {
       if (field.name) data[field.name] = field.value;
     }
 
-    const res = await fetch("http://127.0.0.1:8000/api/predict/", {
+    const res = await fetch("/api/predict/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
     const result = await res.json();
+
     document.getElementById("result").innerHTML = `
       <div style="background:${result.prediction === 1 ? '#fee2e2' : '#d1fae5'};padding:12px;border-radius:5px">
-        <strong>Prediction:</strong> ${result.prediction === 1 ? "Cardiac Risk Detected! Please consult a doctor." : "No Immediate Cardiac Risk Detected"}
+        <strong>Prediction:</strong> ${
+          result.prediction === 1
+            ? "Cardiac Risk Detected! Please consult a doctor."
+            : "No Immediate Cardiac Risk Detected"
+        }
       </div>
     `;
   });
