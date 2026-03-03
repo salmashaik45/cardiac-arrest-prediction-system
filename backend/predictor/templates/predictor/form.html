@@ -3,53 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <title>Cardiac Arrest Prediction</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 600px;
+      max-width: 650px;
       margin: 40px auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      padding: 25px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background-color: #f9fafb;
     }
+
+    h2 {
+      text-align: center;
+    }
+
     label {
       font-weight: bold;
+      margin-top: 10px;
+      display: block;
     }
+
     input, select {
       width: 100%;
-      padding: 6px;
+      padding: 8px;
       margin-top: 4px;
       margin-bottom: 12px;
-      border-radius: 4px;
-      border: 1px solid #aaa;
+      border-radius: 6px;
+      border: 1px solid #bbb;
     }
+
     button {
-      padding: 10px 16px;
+      width: 100%;
+      padding: 12px;
       font-size: 16px;
       background-color: #0284c7;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
+
     button:hover {
       background-color: #0369a1;
     }
+
     #result {
       margin-top: 20px;
-      padding: 12px;
-      border-radius: 6px;
+    }
+
+    .result-card {
+      padding: 15px;
+      border-radius: 10px;
       font-size: 16px;
+    }
+
+    .low { background-color: #d1fae5; }
+    .moderate { background-color: #fef3c7; }
+    .high { background-color: #fee2e2; }
+
+    .sensor-box {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
     }
   </style>
 </head>
+
 <body>
 
-<h2>🫀 Cardiac Arrest Prediction Form</h2>
-<p><em>All fields are mandatory. Sensor data is auto-fetched below.</em></p>
+<h2>🫀 Cardiac Arrest Prediction</h2>
+<p style="text-align:center;"><em>All fields are mandatory. Sensor data is auto-fetched.</em></p>
 
 <form id="predict-form">
-  <label>Age (in years)</label>
+
+  <label>Age</label>
   <input type="number" name="age" required>
 
   <label>Biological Sex</label>
@@ -59,45 +91,45 @@
     <option value="0">Female</option>
   </select>
 
-  <label>Cholesterol Level (mg/dL)</label>
+  <label>Cholesterol (mg/dL)</label>
   <input type="number" name="cholesterol" required>
 
-  <label>Do you have Diabetes?</label>
+  <label>Diabetes</label>
   <select name="diabetes" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label>Family History of Heart Problems?</label>
+  <label>Family History</label>
   <select name="family" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label>Do you smoke?</label>
+  <label>Smoking</label>
   <select name="smoke" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label>Consume Alcohol?</label>
+  <label>Alcohol</label>
   <select name="alcohol" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label>Previous Heart Conditions?</label>
+  <label>Previous Heart Problems</label>
   <select name="prev_heart" required>
     <option value="">Select</option>
     <option value="0">No</option>
     <option value="1">Yes</option>
   </select>
 
-  <label>Cardiac Medication?</label>
+  <label>Medication Use</label>
   <select name="meds" required>
     <option value="">Select</option>
     <option value="0">No</option>
@@ -107,10 +139,10 @@
   <label>Stress Level (1-10)</label>
   <input type="number" name="stress" min="1" max="10" required>
 
-  <label>Physical Activity Days/Week (0-7)</label>
+  <label>Physical Activity (days/week)</label>
   <input type="number" name="activity" min="0" max="7" required>
 
-  <label>Sleep Hours/Day</label>
+  <label>Sleep Hours</label>
   <input type="number" name="sleep" min="1" max="24" required>
 
   <label>Systolic BP</label>
@@ -124,68 +156,90 @@
 
 <div id="result"></div>
 
-<h3>Live Sensor Data</h3>
-<p>Heart Rate: <span id="heart-rate">Loading...</span> bpm</p>
-<p>SpO₂: <span id="spo2">Loading...</span>%</p>
-<p>Body Temp: <span id="body-temp">Loading...</span> °C</p>
+<div class="sensor-box">
+  <h3>Live Sensor Data</h3>
+  <p>Heart Rate: <span id="heart-rate">Loading...</span> bpm</p>
+  <p>SpO₂: <span id="spo2">Loading...</span>%</p>
+  <p>Body Temp: <span id="body-temp">Loading...</span> °C</p>
+</div>
 
 <script>
-  async function fetchSensorData() {
-    try {
-      const res = await fetch("/api/sensor/");
 
-      if (!res.ok) {
-        throw new Error("Sensor API error");
-      }
+async function fetchSensorData() {
+  try {
+    const res = await fetch("/api/sensor/");
+    if (!res.ok) throw new Error("Sensor API error");
 
-      const data = await res.json();
+    const data = await res.json();
 
-      document.getElementById("heart-rate").textContent =
-        parseFloat(data.heart_rate || 0).toFixed(1);
+    document.getElementById("heart-rate").textContent =
+      parseFloat(data.heart_rate).toFixed(1);
 
-      document.getElementById("spo2").textContent =
-        parseFloat(data.spo2 || 0).toFixed(1);
+    document.getElementById("spo2").textContent =
+      parseFloat(data.spo2).toFixed(1);
 
-      document.getElementById("body-temp").textContent =
-        parseFloat(data.body_temp || 0).toFixed(1);
+    document.getElementById("body-temp").textContent =
+      parseFloat(data.body_temp).toFixed(1);
 
-    } catch (e) {
-      console.error("Sensor fetch error:", e);
-      document.getElementById("heart-rate").textContent = "N/A";
-      document.getElementById("spo2").textContent = "N/A";
-      document.getElementById("body-temp").textContent = "N/A";
-    }
+  } catch (e) {
+    document.getElementById("heart-rate").textContent = "N/A";
+    document.getElementById("spo2").textContent = "N/A";
+    document.getElementById("body-temp").textContent = "N/A";
+  }
+}
+
+document.getElementById("predict-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const form = event.target;
+  const data = {};
+
+  for (const field of form.elements) {
+    if (field.name) data[field.name] = field.value;
   }
 
-  document.getElementById("predict-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const data = {};
-
-    for (const field of form.elements) {
-      if (field.name) data[field.name] = field.value;
-    }
-
+  try {
     const res = await fetch("/api/predict/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
+    if (!res.ok) throw new Error("Prediction API error");
+
     const result = await res.json();
 
+    const probability = result.risk_probability;
+    let riskClass = "";
+    let riskLevel = "";
+
+    if (probability < 40) {
+      riskClass = "low";
+      riskLevel = "Low Risk";
+    } else if (probability < 70) {
+      riskClass = "moderate";
+      riskLevel = "Moderate Risk";
+    } else {
+      riskClass = "high";
+      riskLevel = "High Risk";
+    }
+
     document.getElementById("result").innerHTML = `
-      <div style="background:${result.prediction === 1 ? '#fee2e2' : '#d1fae5'};padding:12px;border-radius:5px">
-        <strong>Prediction:</strong> ${
-          result.prediction === 1
-            ? "Cardiac Risk Detected! Please consult a doctor."
-            : "No Immediate Cardiac Risk Detected"
-        }
+      <div class="result-card ${riskClass}">
+        <h3>Prediction Result</h3>
+        <p><strong>Risk Level:</strong> ${riskLevel}</p>
+        <p><strong>Risk Probability:</strong> ${probability}%</p>
       </div>
     `;
-  });
 
-  window.addEventListener("load", fetchSensorData);
+  } catch (e) {
+    document.getElementById("result").innerHTML =
+      "<div class='result-card high'>Prediction failed. Please try again.</div>";
+  }
+});
+
+window.addEventListener("load", fetchSensorData);
+
 </script>
 
 </body>
