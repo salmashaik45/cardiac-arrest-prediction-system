@@ -88,10 +88,11 @@ print("ROC-AUC  :", roc_auc_score(y_test, y_prob))
 print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
 # --------------------------
-# Save Model
+# Save Model + Metadata
 # --------------------------
 
 joblib.dump(model, "models/best_model.pkl")
 joblib.dump(scaler, "models/scaler.pkl")
+joblib.dump(X.columns.tolist(), "models/feature_columns.pkl")
 
-print("\nModel saved successfully.")
+print("\nModel, scaler, and feature columns saved successfully.")
