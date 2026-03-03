@@ -1,245 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Cardiac Arrest Prediction</title>
-
+  <title>Heart Disease Risk Prediction</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 650px;
+      font-family: Arial;
+      max-width: 700px;
       margin: 40px auto;
-      padding: 25px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background-color: #f9fafb;
     }
-
-    h2 {
-      text-align: center;
-    }
-
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-
+    label { font-weight: bold; }
     input, select {
       width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #bbb;
+      padding: 6px;
+      margin: 6px 0 14px 0;
     }
-
     button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #0284c7;
+      padding: 10px;
+      background: #2563eb;
       color: white;
       border: none;
-      border-radius: 8px;
       cursor: pointer;
-      margin-top: 10px;
     }
-
-    button:hover {
-      background-color: #0369a1;
-    }
-
     #result {
       margin-top: 20px;
-    }
-
-    .result-card {
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-
-    .low { background-color: #d1fae5; }
-    .moderate { background-color: #fef3c7; }
-    .high { background-color: #fee2e2; }
-
-    .sensor-box {
-      margin-top: 25px;
       padding: 12px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #ddd;
+      border-radius: 6px;
     }
   </style>
 </head>
-
 <body>
 
-<h2>🫀 Cardiac Arrest Prediction</h2>
-<p style="text-align:center;"><em>All fields are mandatory. Sensor data is auto-fetched.</em></p>
+<h2>Heart Disease Risk Prediction (UCI Dataset)</h2>
 
 <form id="predict-form">
 
-  <label>Age</label>
-  <input type="number" name="age" required>
+<label>Age</label>
+<input type="number" name="age" required>
 
-  <label>Biological Sex</label>
-  <select name="sex" required>
-    <option value="">Select</option>
-    <option value="1">Male</option>
-    <option value="0">Female</option>
-  </select>
+<label>Sex</label>
+<select name="sex" required>
+  <option value="Male">Male</option>
+  <option value="Female">Female</option>
+</select>
 
-  <label>Cholesterol (mg/dL)</label>
-  <input type="number" name="cholesterol" required>
+<label>Chest Pain Type</label>
+<select name="cp" required>
+  <option value="typical angina">Typical Angina</option>
+  <option value="atypical angina">Atypical Angina</option>
+  <option value="non-anginal">Non-Anginal</option>
+  <option value="asymptomatic">Asymptomatic</option>
+</select>
 
-  <label>Diabetes</label>
-  <select name="diabetes" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Resting Blood Pressure</label>
+<input type="number" name="trestbps" required>
 
-  <label>Family History</label>
-  <select name="family" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Cholesterol</label>
+<input type="number" name="chol" required>
 
-  <label>Smoking</label>
-  <select name="smoke" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Fasting Blood Sugar > 120 mg/dl</label>
+<select name="fbs" required>
+  <option value="True">Yes</option>
+  <option value="False">No</option>
+</select>
 
-  <label>Alcohol</label>
-  <select name="alcohol" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Rest ECG</label>
+<select name="restecg" required>
+  <option value="normal">Normal</option>
+  <option value="lv hypertrophy">LV Hypertrophy</option>
+  <option value="st-t abnormality">ST-T Abnormality</option>
+</select>
 
-  <label>Previous Heart Problems</label>
-  <select name="prev_heart" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Max Heart Rate Achieved</label>
+<input type="number" name="thalch" required>
 
-  <label>Medication Use</label>
-  <select name="meds" required>
-    <option value="">Select</option>
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
+<label>Exercise Induced Angina</label>
+<select name="exang" required>
+  <option value="True">Yes</option>
+  <option value="False">No</option>
+</select>
 
-  <label>Stress Level (1-10)</label>
-  <input type="number" name="stress" min="1" max="10" required>
+<label>Oldpeak (ST depression)</label>
+<input type="number" step="0.1" name="oldpeak" required>
 
-  <label>Physical Activity (days/week)</label>
-  <input type="number" name="activity" min="0" max="7" required>
+<label>Slope</label>
+<select name="slope" required>
+  <option value="upsloping">Upsloping</option>
+  <option value="flat">Flat</option>
+  <option value="downsloping">Downsloping</option>
+</select>
 
-  <label>Sleep Hours</label>
-  <input type="number" name="sleep" min="1" max="24" required>
+<label>Number of Major Vessels (0–3)</label>
+<input type="number" name="ca" min="0" max="3" required>
 
-  <label>Systolic BP</label>
-  <input type="number" name="sbp" required>
+<label>Thal</label>
+<select name="thal" required>
+  <option value="normal">Normal</option>
+  <option value="fixed defect">Fixed Defect</option>
+  <option value="reversable defect">Reversible Defect</option>
+</select>
 
-  <label>Diastolic BP</label>
-  <input type="number" name="dbp" required>
+<button type="submit">Predict</button>
 
-  <button type="submit">Predict Cardiac Risk</button>
 </form>
 
 <div id="result"></div>
 
-<div class="sensor-box">
-  <h3>Live Sensor Data</h3>
-  <p>Heart Rate: <span id="heart-rate">Loading...</span> bpm</p>
-  <p>SpO₂: <span id="spo2">Loading...</span>%</p>
-  <p>Body Temp: <span id="body-temp">Loading...</span> °C</p>
-</div>
-
 <script>
+document.getElementById("predict-form").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-async function fetchSensorData() {
-  try {
-    const res = await fetch("/api/sensor/");
-    if (!res.ok) throw new Error("Sensor API error");
-
-    const data = await res.json();
-
-    document.getElementById("heart-rate").textContent =
-      parseFloat(data.heart_rate).toFixed(1);
-
-    document.getElementById("spo2").textContent =
-      parseFloat(data.spo2).toFixed(1);
-
-    document.getElementById("body-temp").textContent =
-      parseFloat(data.body_temp).toFixed(1);
-
-  } catch (e) {
-    document.getElementById("heart-rate").textContent = "N/A";
-    document.getElementById("spo2").textContent = "N/A";
-    document.getElementById("body-temp").textContent = "N/A";
-  }
-}
-
-document.getElementById("predict-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const form = event.target;
+  const formData = new FormData(this);
   const data = {};
 
-  for (const field of form.elements) {
-    if (field.name) data[field.name] = field.value;
-  }
-
-  try {
-    const res = await fetch("/api/predict/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    if (!res.ok) throw new Error("Prediction API error");
-
-    const result = await res.json();
-
-    const probability = result.risk_probability;
-    let riskClass = "";
-    let riskLevel = "";
-
-    if (probability < 40) {
-      riskClass = "low";
-      riskLevel = "Low Risk";
-    } else if (probability < 70) {
-      riskClass = "moderate";
-      riskLevel = "Moderate Risk";
+  formData.forEach((value, key) => {
+    if (!isNaN(value) && value !== "") {
+      data[key] = Number(value);
     } else {
-      riskClass = "high";
-      riskLevel = "High Risk";
+      data[key] = value;
     }
+  });
 
-    document.getElementById("result").innerHTML = `
-      <div class="result-card ${riskClass}">
-        <h3>Prediction Result</h3>
-        <p><strong>Risk Level:</strong> ${riskLevel}</p>
-        <p><strong>Risk Probability:</strong> ${probability}%</p>
-      </div>
-    `;
+  const response = await fetch("/api/predict/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-  } catch (e) {
-    document.getElementById("result").innerHTML =
-      "<div class='result-card high'>Prediction failed. Please try again.</div>";
-  }
+  const result = await response.json();
+
+  document.getElementById("result").innerHTML = `
+    <div style="background:${result.prediction === 1 ? '#fee2e2' : '#d1fae5'}">
+      <strong>Risk Level:</strong> ${result.prediction === 1 ? "Heart Disease Detected" : "Low Risk"} <br>
+      <strong>Risk Probability:</strong> ${result.risk_probability}%
+    </div>
+  `;
 });
-
-window.addEventListener("load", fetchSensorData);
-
 </script>
 
 </body>
