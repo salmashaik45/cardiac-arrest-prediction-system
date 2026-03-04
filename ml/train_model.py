@@ -1,118 +1,95 @@
 import pandas as pd
-import numpy as np
 import joblib
 import os
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 
-from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    roc_auc_score,
-    confusion_matrix
-)
 
-# -----------------------------
+# ==============================
 # Load Dataset
-# -----------------------------
+# ==============================
 
-df = pd.read_csv("cardiac_arrest.csv")
+df = pd.read_csv("heart_disease_uci.csv")
 
-X = df.drop("Heart Attack Risk", axis=1)
-y = df["Heart Attack Risk"]
+# Convert target into binary
+df["num"] = df["num"].apply(lambda x: 1 if x > 0 else 0)
 
-# -----------------------------
-# Train-Test Split (Stratified)
-# -----------------------------
+# Drop unused columns
+df = df.drop(columns=["id", "dataset"])
+
+# Convert boolean to int
+df = df.replace({True: 1, False: 0})
+
+# One-hot encode categoricals
+df = pd.get_dummies(df, drop_first=True)
+
+# ==============================
+# Features / Target
+# ==============================
+
+X = df.drop("num", axis=1)
+y = df["num"]
+
+# ==============================
+# Handle Missing Values
+# ==============================
+
+imputer = SimpleImputer(strategy="median")
+X_imputed = imputer.fit_transform(X)
+
+# Save feature names AFTER encoding
+feature_columns = X.columns.tolist()
+
+# ==============================
+# Train/Test Split
+# ==============================
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,
-    random_state=42,
-    stratify=y
+    X_imputed, y, test_size=0.2, random_state=42
 )
 
-# -----------------------------
+# ==============================
 # Scaling
-# -----------------------------
+# ==============================
 
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# -----------------------------
-# Models
-# -----------------------------
+# ==============================
+# Model
+# ==============================
 
-models = {
-    "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced"),
-    "Random Forest": RandomForestClassifier(n_estimators=200, random_state=42),
-    "SVM": SVC(probability=True, class_weight="balanced"),
-    "KNN": KNeighborsClassifier(n_neighbors=5)
-}
+model = LogisticRegression(max_iter=3000)
+model.fit(X_train_scaled, y_train)
 
-results = {}
+# ==============================
+# Evaluation
+# ==============================
 
-# -----------------------------
-# Train & Evaluate
-# -----------------------------
+y_pred = model.predict(X_test_scaled)
+y_prob = model.predict_proba(X_test_scaled)[:, 1]
 
-for name, model in models.items():
+print("\nAccuracy :", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall   :", recall_score(y_test, y_pred))
+print("F1 Score :", f1_score(y_test, y_pred))
+print("ROC-AUC  :", roc_auc_score(y_test, y_prob))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-    model.fit(X_train_scaled, y_train)
-
-    preds = model.predict(X_test_scaled)
-    probs = model.predict_proba(X_test_scaled)[:, 1]
-
-    accuracy = accuracy_score(y_test, preds)
-    precision = precision_score(y_test, preds)
-    recall = recall_score(y_test, preds)
-    f1 = f1_score(y_test, preds)
-    roc_auc = roc_auc_score(y_test, probs)
-    cm = confusion_matrix(y_test, preds)
-
-    results[name] = {
-        "model": model,
-        "f1": f1,
-        "roc_auc": roc_auc
-    }
-
-    print("\n==============================")
-    print(f"{name}")
-    print("==============================")
-    print(f"Accuracy : {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
-    print(f"F1 Score : {f1:.4f}")
-    print(f"ROC-AUC  : {roc_auc:.4f}")
-    print("Confusion Matrix:")
-    print(cm)
-
-# -----------------------------
-# Select Best Model (Based on F1)
-# -----------------------------
-
-best_model_name = max(results, key=lambda x: results[x]["f1"])
-best_model = results[best_model_name]["model"]
-
-print("\n==============================")
-print(f"Best Model Selected: {best_model_name}")
-print("==============================")
-
-# -----------------------------
-# Save Model
-# -----------------------------
+# ==============================
+# Save Everything
+# ==============================
 
 os.makedirs("models", exist_ok=True)
 
-joblib.dump(best_model, "models/best_model.pkl")
+joblib.dump(model, "models/best_model.pkl")
 joblib.dump(scaler, "models/scaler.pkl")
+joblib.dump(imputer, "models/imputer.pkl")
+joblib.dump(feature_columns, "models/feature_columns.pkl")
 
-print("Model and scaler saved successfully.")
+print("\nModel, scaler, imputer, and feature columns saved successfully.")
