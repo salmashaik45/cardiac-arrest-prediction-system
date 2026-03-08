@@ -95,7 +95,7 @@ The predicted probability is classified into three categories:
 
 ---
 
-# 🖥 Application Interface
+## 🖥 Application Interface
 
 ![Application Interface](screenshots/project-interface.png)
 
