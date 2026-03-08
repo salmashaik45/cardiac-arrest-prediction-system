@@ -1,81 +1,132 @@
-# 🫀 Heart Disease Risk Prediction System with IoT Monitoring
+# 🫀 Cardiac Arrest Prediction System
 
-A machine learning–powered web application that predicts the probability of heart disease risk based on clinical inputs. The system integrates a trained ML model with a Django backend API and a web dashboard, while also displaying real-time vital readings from IoT sensors.
+A Machine Learning and IoT-based web application that predicts cardiac arrest risk using medical parameters and displays real-time physiological data from IoT sensors via ThingSpeak cloud integration.
 
-## 📌 Project Overview
+---
 
-This project predicts the likelihood of heart disease using a Logistic Regression model trained on the UCI Heart Disease dataset.
+## 📌 Overview
 
-Users enter clinical parameters through a web interface. The backend processes these inputs through a trained ML pipeline and returns a risk probability and risk level (Low / Moderate / High).
+The **Cardiac Arrest Prediction System** is a web-based healthcare application that predicts the risk of cardiac arrest using machine learning algorithms and patient health parameters.
 
-The system also displays live IoT vital readings collected from sensors connected to an ESP8266 microcontroller and transmitted through the ThingSpeak cloud platform.
+The system also integrates **IoT-based health monitoring** by retrieving real-time physiological data such as heart rate, oxygen saturation, and body temperature from IoT sensors through the **ThingSpeak cloud platform**.
 
-## 🚀 Features
+This project demonstrates the integration of:
 
-- Machine learning–based heart disease risk prediction
+- Machine Learning for health risk prediction
+- IoT sensors for real-time physiological monitoring
+- Cloud data retrieval using APIs
+- Web application development using Django
 
-- Clean web dashboard for clinical data input
+---
 
-- Django backend API for ML inference
+## 🚀 Live Demo
 
-- Real-time IoT vital monitoring
+🔗 https://cardiac-arrest-predictor.onrender.com
 
-- End-to-end ML pipeline with preprocessing
+---
 
-- Probability-based risk classification
+## 🧠 Machine Learning Model
 
-- Modular project structure suitable for deployment
+The system uses a **Logistic Regression model** trained on the **UCI Heart Disease dataset**.
 
-## 🧠 Machine Learning Pipeline
-
-### Dataset
-
-UCI Heart Disease Dataset
-
-### Model
-
-Logistic Regression
-
-### Preprocessing
-
-- Missing value imputation
-
-- One-hot encoding for categorical features
-
-- Feature alignment using saved feature metadata
-
-- Standard scaling
-
-### Evaluation Metrics
-
-| Metric    | Value |
-|-----------|-------|
-| Accuracy  | ~80%  |
-| Precision | ~86%  |
-| Recall    | ~79%  |
-| F1 Score  | ~0.82 |
-| ROC-AUC   | ~0.88 |
-
-## 🏗 System Architecture
+### Model Performance
 
 ```
-IoT Sensors (MAX30102, DS18B20)
-        │
-        ▼
-ThingSpeak Cloud Platform
-        │
-        ▼
+| Metric    |  Value |
+|-----------|--------|
+| Accuracy  | 80.43% |
+| Precision | 86.13% |
+| Recall    | 79.82% |
+| F1 Score  | 82.86% |
+| ROC-AUC   | 0.889  |
+```
+
+---
+
+## ⚙️ Features
+
+-  Heart disease risk prediction using Machine Learning  
+-  Probability-based risk classification (Low / Moderate / High)  
+-  Django-based backend API for prediction  
+-  Real-time IoT sensor monitoring via ThingSpeak cloud  
+-  Data preprocessing with scaling and missing value handling  
+-  Simple web interface for entering medical parameters  
+-  Deployed cloud application accessible from anywhere  
+
+---
+
+## 📡 IoT Integration
+
+The system retrieves real-time physiological data from IoT sensors connected to the **ThingSpeak cloud platform**.
+
+### Vital parameters monitored:
+
+- Heart Rate (bpm)
+- Oxygen Saturation (SpO₂ %)
+- Body Temperature (°C)
+
+### Data Flow
+
+```
+IoT Sensors
+     ↓
+Microcontroller
+     ↓
+ThingSpeak Cloud
+     ↓
 Django Backend API
-        │
-        ▼
-Machine Learning Model
-        │
-        ▼
-Prediction Result
-        │
-        ▼
-Web Dashboard UI
+     ↓
+Web Application UI
 ```
+
+---
+
+## 📊 Risk Prediction Categories
+
+The predicted probability is classified into three categories:
+
+```
+| Risk Probability |    Risk Level  |
+|------------------|--------------- |
+|    0% – 40%      |  Low Risk      |
+|    40% – 70%     |  Moderate Risk |
+|    70% – 100%    |  High Risk     |
+```
+
+---
+
+# 🖥 Application Interface
+
+![Application Interface](screenshots/project-interface.png)
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+- Python
+- Django
+- Django REST API
+
+### Machine Learning
+- Scikit-learn
+- Pandas
+- NumPy
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### IoT & Cloud
+- IoT Sensors
+- ThingSpeak Cloud API
+
+### Deployment
+- Render
+- Gunicorn
+
+---
 
 ## 📂 Project Structure
 
@@ -83,117 +134,132 @@ Web Dashboard UI
 cardiac-arrest-prediction-system
 │
 ├── backend
-│   ├── manage.py
-│   ├── cardiac_predictor
-│   └── predictor
+│ ├── cardiac_predictor
+│ │ ├── settings.py
+│ │ ├── urls.py
+│ │ └── wsgi.py
+│ │
+│ ├── predictor
+│ │ ├── views.py
+│ │ ├── utils.py
+│ │ ├── urls.py
+│ │ └── templates
+│ │
+│ └── manage.py
 │
 ├── ml
-│   ├── train_model.py
-│   └── models
+│ ├── train_model.py
+│ ├── models
+│ │ ├── best_model.pkl
+│ │ ├── scaler.pkl
+│ │ ├── imputer.pkl
+│ │ └── feature_columns.pkl
 │
-├── hardware
-│   ├── iot-code.ino
-│   └── secrets_example.h
+├── screenshots
+│ └── project-interface.png
 │
 ├── requirements.txt
-├── .gitignore
 └── README.md
 ```
 
-## 🖥 Application Interface
+---
 
-### Prediction Form
+## 🔧 Installation
 
-Users enter clinical health parameters to estimate heart disease risk.
-
-The system returns the probability and classifies the risk.
-
-### Example:
+### 1️⃣ Clone Repository
 
 ```
-Low Risk — 1.66%
-Moderate Risk — 44.79%
-High Risk — 99.03%
+git clone https://github.com/salmashaik45/cardiac-arrest-prediction-system.git
+
+cd cardiac-arrest-prediction-system
 ```
 
-## Live IoT Monitoring
+---
 
-The dashboard also displays real-time vital signs:
+### 2️⃣ Create Virtual Environment
 
-- Heart Rate
-
-- Oxygen Saturation (SpO₂)
-
-- Body Temperature
-
-These readings are streamed via ThingSpeak.
-
-🧪 Example Predictions
-Healthy profile
-Age: 28
-Sex: Female
-Cholesterol: 170
-BP: 110
-Result → Low Risk (1.66%)
-Moderate profile
-Age: 52
-BP: 140
-Cholesterol: 240
-Result → Moderate Risk (~45%)
-High risk profile
-Age: 63
-Chest Pain: asymptomatic
-Oldpeak: 3.5
-Result → High Risk (~99%)
-⚙ Installation
-Clone repository
-git clone https://github.com/yourusername/heart-disease-prediction.git
-cd heart-disease-prediction
-Create virtual environment
+```
 python -m venv venv
+```
+
 Activate environment
 
-Windows
+### Windows:
 
-venv\Scripts\Activate
-Install dependencies
+```
+venv\Scripts\activate
+```
+
+### Mac/Linux:
+
+```
+source venv/bin/activate
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+```
 pip install -r requirements.txt
-▶ Running the Application
+```
 
-Navigate to backend:
+---
 
+### 4️⃣ Run the Server
+
+```
 cd backend
-
-Start Django server:
-
 python manage.py runserver
+```
 
 Open in browser:
 
+```
 http://127.0.0.1:8000
-⚠ Disclaimer
+```
 
-This project is intended for educational and research purposes only.
-It should not be used as a substitute for professional medical diagnosis.
+---
 
-👩‍💻 Author
+## 📊 Dataset
 
-Salma
-Computer Science & Engineering Student
+The machine learning model was trained using the **UCI Heart Disease Dataset**, which includes clinical attributes such as:
 
-⭐ If you found this project useful, consider giving it a star.
-Small advice for you
+- Age
+- Sex
+- Chest Pain Type
+- Resting Blood Pressure
+- Cholesterol
+- Fasting Blood Sugar
+- Rest ECG
+- Maximum Heart Rate
+- Exercise Induced Angina
+- ST Depression (Oldpeak)
+- Slope
+- Number of Major Vessels
+- Thalassemia
 
-For GitHub projects, recruiters love screenshots.
+---
 
-So later you can create a folder:
+## 📈 Future Improvements
 
-docs/images/
+- Integration with wearable health devices
+- Real-time ECG signal analysis
+- Mobile application interface
+- Deep learning based prediction models
+- Alert system for high-risk patients
 
-and add:
+---
 
-form.png
-prediction.png
-dashboard.png
+## 👩‍💻 Author
 
-Then your README will look much more professional.
+**Salma Shaik**  
+Computer Science and Engineering Student  
+
+🔗 GitHub: https://github.com/salmashaik45
+
+---
+
+## 📜 License
+
+This project is developed for educational and research purposes.
