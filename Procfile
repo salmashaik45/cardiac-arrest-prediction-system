@@ -1,0 +1,1 @@
+web: gunicorn backend.cardiac_predictor.wsgi
